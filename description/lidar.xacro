@@ -13,7 +13,7 @@
             <geometry>
                 <cylinder radius="0.05" length="0.04" />
             </geometry>
-            <material name="red" />
+            <!-- <material name="red" /> -->
         </visual>
         <collision>
             <geometry>
@@ -50,7 +50,7 @@
                     <argument>~/out:=scan</argument>
                 </ros>
                 <output_type>sensor_msgs/LaserScan</output_type>
-                <frameName>laser_frame</frameName>
+                <frame_name>laser_frame</frame_name>
             </plugin>
         </sensor>
     </gazebo>

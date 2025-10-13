@@ -1,0 +1,55 @@
+controller_manager:
+  ros__parameters:
+    update_rate: 30           # Hz that controller_manager runs
+    use_sim_time: true        # set false on real robot
+
+    # Controllers to load (but not start)
+    diff_cont:
+      type: diff_drive_controller/DiffDriveController
+    joint_broad:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+# --- Diff drive controller parameters ---
+diff_cont:
+  ros__parameters:
+    publish_rate: 50.0        # Odometry/TF publish rate (Hz)
+
+    # Frames
+    base_frame_id: base_link
+    odom_frame_id: odom
+    enable_odom_tf: true
+
+    # Wheel joints (must match URDF)
+    left_wheel_names:  ['left_wheel_joint']
+    right_wheel_names: ['right_wheel_joint']
+
+    # Geometry (EDIT to your robot)
+    wheel_separation: 0.35     # m (center-to-center)
+    wheel_radius: 0.05         # m
+
+    # Command handling
+    # cmd_vel_timeout: 0.25      # s; stop if no /cmd_vel
+    use_stamped_vel: false
+
+    # Velocity limits (optional; tune as needed)
+    # linear.x.has_velocity_limits: true
+    # linear.x.max_velocity: 0.8          # m/s
+    # angular.z.has_velocity_limits: true
+    # angular.z.max_velocity: 2.0         # rad/s
+
+    # Accel limits (optional)
+    # linear.x.has_acceleration_limits: true
+    # linear.x.max_acceleration: 1.5     # m/s^2
+    # angular.z.has_acceleration_limits: true
+    # angular.z.max_acceleration: 3.0    # rad/s^2
+
+    # Kinematics tweaks (optional)
+    # open_loop: false                  # set true if no wheel feedback
+    # wheels_per_side: 1
+    # wheel_separation_multiplier: 1.0
+    # left_wheel_radius_multiplier: 1.0
+    # right_wheel_radius_multiplier: 1.0
+
+# --- Joint state broadcaster has no params by default ---
+# joint_broad:
+#   ros__parameters: {}
