@@ -36,7 +36,9 @@
   <!-- Load gazebo_ros2_control so the above block is honored in Gazebo Classic -->
   <gazebo>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-      <parameters>$(find my_bot)/config/my_controller.yaml</parameters>
+      <ros2_control>
+        <parameters>$(find my_bot)/config/my_controller.yaml</parameters>
+      </ros2_control>
     </plugin>
   </gazebo>
 
