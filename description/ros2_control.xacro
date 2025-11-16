@@ -37,9 +37,10 @@
   <gazebo>
     <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
       <ros2_control>
-        <parameters>$(find my_bot)/config/my_controller.yaml</parameters>
+        <parameters>/home/omar/projects/dev_ws/install/my_bot/share/my_bot/config/my_controller.yaml</parameters>
       </ros2_control>
     </plugin>
   </gazebo>
+
 
 </robot>
