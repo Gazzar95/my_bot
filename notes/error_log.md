@@ -14,5 +14,5 @@
 
 ## 3. parser error Couldn't parse parameter override rule
 - **Error**: `[gazebo_ros2_control]: parser error Couldn't parse parameter override rule: '--param robot_description:=<?xml ...'`
-- **Cause**: `gazebo_ros2_control` spawns an internal ROS 2 node with `--param robot_description:=<URDF>` and the raw XML (angle brackets, commas, quotes) is blowing up the `rcl` argument parser.
-- **Status**: Investigating. Need to keep plugin from passing the full URDF on the command-line—either load the URDF from a file or supply it via a params file/launch argument so the plugin never has to parse the raw XML string.
+- **Cause**: `gazebo_ros2_control` pushes the URDF onto its node argv (`--param robot_description:=<URDF>`), and colon/URL content inside XML comments made `rcl`'s argument parser fail.
+- **Fix**: Remove/adjust the problematic comments (colon/URL/`###` text) from the xacros so the generated URDF string is parser-safe. After rebuilding/sourcing, the controller manager loads cleanly.

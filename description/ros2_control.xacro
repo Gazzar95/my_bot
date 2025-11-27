@@ -1,7 +1,6 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <!-- ros2_control: Gazebo-backed system (Classic Gazebo) -->
   <ros2_control name="GazeboSystem" type="system">
     <hardware>
       <!-- Uses the GazeboSystem shim provided by gazebo_ros2_control -->
