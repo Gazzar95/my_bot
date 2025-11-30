@@ -31,7 +31,7 @@ def generate_launch_description():
             get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
         launch_arguments={'world': os.path.join(
             get_package_share_directory(
-                package_name), 'worlds', 'my_dev.world'
+                package_name), 'worlds', 'empty.world'
         )}.items()
     )
 

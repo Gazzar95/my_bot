@@ -10,7 +10,8 @@
 
 ## 2. gzclient camera assertion
 - **Error**: `gzclient: ... boost::shared_ptr<gazebo::rendering::Camera>::operator->() ... Assertion 'px != 0' failed`
-- **Status**: Still investigating. Workaround: launch Gazebo headless or disable the camera GUI plugin until the sensor config is fixed.
+- **Cause**: Gazebo plugins (camera/depth camera) weren’t being found because Gazebo’s environment wasn’t sourced; the GUI tried to dereference a camera that never initialized and crashed.
+- **Fix**: Source Gazebo after the workspace so its paths are set: `source /home/omar/projects/dev_ws/install/setup.bash && source /usr/share/gazebo/setup.sh`. Also cleaned up the camera xacro and matched the depth sensor to the depth camera plugin.
 
 ## 3. parser error Couldn't parse parameter override rule
 - **Error**: `[gazebo_ros2_control]: parser error Couldn't parse parameter override rule: '--param robot_description:=<?xml ...'`
