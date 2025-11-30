@@ -3,61 +3,96 @@ import os
 
 from ament_index_python.packages import get_package_share_directory
 
-
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import IncludeLaunchDescription, TimerAction, RegisterEventHandler
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node
+from launch.event_handlers import OnProcessStart
 
 
 def generate_launch_description():
 
-    # Include the robot_state_publisher launch file, provided by our own package. Force sim time to be enabled
-    # !!! MAKE SURE YOU SET THE PACKAGE NAME CORRECTLY !!!
+    package_name = 'my_bot'
 
-    package_name = 'my_bot'  # <--- CHANGE ME
-
+    # 1) Robot state publisher (URDF -> TF), with sim time
     rsp = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory(
-                package_name), 'launch', 'rsp.launch.py'
-        )]), launch_arguments={'use_sim_time': 'true'}.items()
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory(package_name),
+                'launch',
+                'rsp.launch.py'
+            )
+        ),
+        launch_arguments={'use_sim_time': 'true'}.items()
     )
 
-    # Include the Gazebo launch file, provided by the gazebo_ros package
+    # 2) Gazebo + my world
     gazebo = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([os.path.join(
-            get_package_share_directory('gazebo_ros'), 'launch', 'gazebo.launch.py')]),
-        launch_arguments={'world': os.path.join(
-            get_package_share_directory(
-                package_name), 'worlds', 'empty.world'
-        )}.items()
+        PythonLaunchDescriptionSource(
+            os.path.join(
+                get_package_share_directory('gazebo_ros'),
+                'launch',
+                'gazebo.launch.py'
+            )
+        ),
+        launch_arguments={
+            'world': os.path.join(
+                get_package_share_directory(package_name),
+                'worlds',
+                'empty.world',   # or 'my_dev.world' when you switch back
+            )
+        }.items()
     )
 
-    # Run the spawner node from the gazebo_ros package. The entity name doesn't really matter if you only have a single robot.
-    spawn_entity = Node(package='gazebo_ros', executable='spawn_entity.py',
-                        arguments=['-topic', 'robot_description',
-                                   '-entity', 'my_bot'],
-                        output='screen')
-
-    diff_drive_spawner = Node(
-        package="controller_manager",
-        executable="spawner.py",
-        arguments=["diff_cont"],
+    # 3) Spawn the robot into Gazebo using the robot_description topic
+    spawn_entity = Node(
+        package='gazebo_ros',
+        executable='spawn_entity.py',
+        arguments=['-topic', 'robot_description',
+                   '-entity', 'my_bot'],
+        output='screen',
     )
 
+    # 4) Controller spawners (do NOT start immediately)
+    # joint_state_broadcaster first
     joint_broad_spawner = Node(
-        package="controller_manager",
-        executable="spawner.py",
-        arguments=["joint_broad"],
+        package='controller_manager',
+        executable='spawner.py',
+        arguments=['joint_broad'],
+        output='screen',
     )
 
-    # Launch them all!
+    # diff drive controller
+    diff_drive_spawner = Node(
+        package='controller_manager',
+        executable='spawner.py',
+        arguments=['diff_cont'],
+        output='screen',
+    )
+
+    # 5) Delay controller spawners until after the robot is spawned
+    #
+    # - OnProcessStart waits for spawn_entity to start
+    # - TimerAction adds an extra delay (e.g. 3s) to let gazebo_ros2_control initialize
+    controller_spawner_event = RegisterEventHandler(
+        OnProcessStart(
+            target_action=spawn_entity,
+            on_start=[
+                TimerAction(
+                    period=3.0,  # seconds; tweak if needed
+                    actions=[
+                        joint_broad_spawner,
+                        diff_drive_spawner,
+                    ],
+                )
+            ],
+        )
+    )
+
     return LaunchDescription([
         rsp,
         gazebo,
         spawn_entity,
-        diff_drive_spawner,
-        joint_broad_spawner
+        controller_spawner_event,
     ])
