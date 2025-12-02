@@ -58,7 +58,7 @@ def generate_launch_description():
     # joint_state_broadcaster first
     joint_broad_spawner = Node(
         package='controller_manager',
-        executable='spawner.py',
+        executable='spawner',
         arguments=['joint_broad'],
         output='screen',
     )
@@ -66,7 +66,7 @@ def generate_launch_description():
     # diff drive controller
     diff_drive_spawner = Node(
         package='controller_manager',
-        executable='spawner.py',
+        executable='spawner',
         arguments=['diff_cont'],
         output='screen',
     )
