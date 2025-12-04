@@ -15,6 +15,12 @@ def generate_launch_description():
 
     package_name = 'my_bot'
 
+    slam_params_file = os.path.join(
+        get_package_share_directory(package_name),
+        'config',
+        'mapper_params_online_async.yaml',
+    )
+
     # 1) Robot state publisher (URDF -> TF), with sim time
     rsp = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -40,7 +46,7 @@ def generate_launch_description():
             'world': os.path.join(
                 get_package_share_directory(package_name),
                 'worlds',
-                'empty.world',   # or 'my_dev.world' when you switch back
+                'my_dev.world',
             )
         }.items()
     )
@@ -90,9 +96,19 @@ def generate_launch_description():
         )
     )
 
+    # 6) SLAM Toolbox (async)
+    slam_toolbox = Node(
+        package='slam_toolbox',
+        executable='async_slam_toolbox_node',
+        name='slam_toolbox',
+        output='screen',
+        parameters=[slam_params_file, {'use_sim_time': 'true'}],
+    )
+
     return LaunchDescription([
         rsp,
         gazebo,
         spawn_entity,
         controller_spawner_event,
+        slam_toolbox,
     ])
