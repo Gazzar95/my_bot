@@ -110,5 +110,4 @@ def generate_launch_description():
         gazebo,
         spawn_entity,
         controller_spawner_event,
-        slam_toolbox,
     ])

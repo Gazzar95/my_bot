@@ -15,7 +15,11 @@ slam_toolbox:
     base_frame: base_link
     scan_topic: /scan
     use_map_saver: true
-    mode: mapping # localization
+    mode: localization
+
+    map_file_name: /home/omar/projects/dev_ws/my_map_serial.data
+    #map_start_pose: [0.0, 0.0, 0.0]
+    map_start_at_dock: true
 
     debug_logging: false
     throttle_scans: 1
