@@ -56,3 +56,22 @@
   - **Action**: Plan to power from battery and observe stability.
   - **Result**: Pending.
 - **Next steps**: Power from the robot battery with proper regulation and confirm that undervoltage messages stop and Wi-Fi/USB devices stay stable.
+
+## 6. RPLidar A1M8 scan mode mismatch
+- **Status**: Resolved
+- **Error**: RPLidar scan would not start at 115200/256000 baud despite device enumeration and healthy status.
+- **Suspected cause**: Driver attempted an unsupported scan mode on A1M8 firmware.
+- **Troubleshooting log**:
+  - **Action**: Verified USB enumeration and permissions (`/dev/ttyUSB0`, `/dev/serial/by-id`, dialout).
+  - **Result**: Device enumerated correctly with expected permissions.
+  - **Action**: Confirmed driver reads SDK version, firmware, hardware rev, and health = 0.
+  - **Result**: No hardware faults reported.
+  - **Action**: Tried baudrates (115200, 256000).
+  - **Result**: No change; scan still failed to start.
+  - **Action**: Set explicit scan mode: `'scan_mode': 'Standard'`.
+  - **Result**: Scan starts successfully.
+- **Resolution**: Force simple scan mode and keep A1M8 baudrate:
+  ```python
+  'serial_baudrate': 115200,
+  'scan_mode': 'Standard',
+  ```

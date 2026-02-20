@@ -1,11 +1,20 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <ros2_control name="GazeboSystem" type="system">
-    <hardware>
-      <!-- Uses the GazeboSystem shim provided by gazebo_ros2_control -->
-      <plugin>gazebo_ros2_control/GazeboSystem</plugin>
-    </hardware>
+  <ros2_control name="DriveSystem" type="system">
+    <xacro:if value="$(arg use_sim)">
+      <hardware>
+        <plugin>gazebo_ros2_control/GazeboSystem</plugin>
+      </hardware>
+    </xacro:if>
+
+    <xacro:unless value="$(arg use_sim)">
+      <hardware>
+        <plugin>mobile_robot_hardware/MobileRobotHardware</plugin>
+        <param name="serial_port">$(arg serial_port)</param>
+        <param name="baud_rate">$(arg baud_rate)</param>
+      </hardware>
+    </xacro:unless>
 
     <!-- LEFT WHEEL -->
     <joint name="left_wheel_joint">
@@ -32,13 +41,14 @@
     </joint>
   </ros2_control>
 
-  <!-- Load gazebo_ros2_control so the above block is honored in Gazebo Classic -->
-  <gazebo>
-    <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
-      <robotNamespace>/</robotNamespace>
-      <parameters>$(find my_bot)/config/my_controller.yaml</parameters>
-    </plugin>
-  </gazebo>
+  <xacro:if value="$(arg use_sim)">
+    <gazebo>
+      <plugin name="gazebo_ros2_control" filename="libgazebo_ros2_control.so">
+        <robotNamespace>/</robotNamespace>
+        <parameters>$(find my_bot)/config/my_controller.yaml</parameters>
+      </plugin>
+    </gazebo>
+  </xacro:if>
 
 
 </robot>

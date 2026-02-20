@@ -30,7 +30,7 @@ def generate_launch_description():
                 'rsp.launch.py'
             )
         ),
-        launch_arguments={'use_sim_time': 'true'}.items()
+        launch_arguments={'use_sim_time': 'true', 'use_sim': 'true'}.items()
     )
 
     # 2) Gazebo + my world
