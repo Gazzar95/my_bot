@@ -42,9 +42,9 @@ Left encoder:
 
 /* ========= HARD-CODED DIRECTION / SIGN ========= */
 const bool MOTOR_INVERT_RIGHT = false;
-const bool MOTOR_INVERT_LEFT = true;
+const bool MOTOR_INVERT_LEFT = false;
 const bool ENCODER_SIGN_RIGHT = true;
-const bool ENCODER_SIGN_LEFT = true;
+const bool ENCODER_SIGN_LEFT = false;
 
 /* ----- Encoder conversion -----
 Set this to encoder counts-per-wheel-revolution (after gearbox).
@@ -92,7 +92,7 @@ float integ_r = 0.0f, integ_l = 0.0f;
 float prev_err_r = 0.0f, prev_err_l = 0.0f;
 
 /* ----- Limits ----- */
-const float PWM_MAX = 255.0f;
+const float PWM_MAX = 2000.0f;
 const float INTEG_MAX = 2000.0f;
 
 /* ----- Start assist ----- */
