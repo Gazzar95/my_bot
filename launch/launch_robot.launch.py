@@ -76,7 +76,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             'serial_port',
-            default_value='/dev/ttyUSB0',
+            default_value='/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0',
             description='Serial device used to communicate with Arduino',
         ),
         DeclareLaunchArgument(

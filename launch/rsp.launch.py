@@ -54,7 +54,7 @@ def generate_launch_description():
             description='Use Gazebo ros2_control when true; serial hardware plugin when false'),
         DeclareLaunchArgument(
             'serial_port',
-            default_value='/dev/ttyUSB0',
+            default_value='/dev/serial/by-id/usb-1a86_USB_Serial-if00-port0',
             description='Serial device for hardware interface'),
         DeclareLaunchArgument(
             'baud_rate',
