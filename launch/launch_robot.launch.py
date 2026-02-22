@@ -49,13 +49,15 @@ def generate_launch_description():
         ],
         remappings=[
             ('~/robot_description', '/robot_description'),
+            ('/diff_cont/cmd_vel_unstamped', '/cmd_vel'),
         ],
     )
 
     joint_broad_spawner = Node(
         package='controller_manager',
         executable='spawner',
-        arguments=['joint_broad', '--controller-manager', '/controller_manager'],
+        arguments=['joint_broad', '--controller-manager',
+                   '/controller_manager'],
         output='screen',
     )
 
