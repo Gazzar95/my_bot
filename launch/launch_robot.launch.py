@@ -22,6 +22,11 @@ def generate_launch_description():
         'config',
         'my_controller_real.yaml',
     )
+    twist_mux_config = os.path.join(
+        get_package_share_directory(package_name),
+        'config',
+        'twist_mux.yaml',
+    )
 
     rsp = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -68,6 +73,20 @@ def generate_launch_description():
         output='screen',
     )
 
+    twist_mux = Node(
+        package='twist_mux',
+        executable='twist_mux',
+        name='twist_mux',
+        output='screen',
+        parameters=[
+            twist_mux_config,
+            {'use_sim_time': use_sim_time},
+        ],
+        remappings=[
+            ('cmd_vel_out', '/cmd_vel'),
+        ],
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -88,4 +107,5 @@ def generate_launch_description():
         control_node,
         joint_broad_spawner,
         diff_drive_spawner,
+        twist_mux,
     ])

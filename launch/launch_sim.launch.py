@@ -20,6 +20,11 @@ def generate_launch_description():
         'config',
         'mapper_params_online_async.yaml',
     )
+    twist_mux_params_file = os.path.join(
+        get_package_share_directory(package_name),
+        'config',
+        'twist_mux.yaml',
+    )
 
     # 1) Robot state publisher (URDF -> TF), with sim time
     rsp = IncludeLaunchDescription(
@@ -105,9 +110,23 @@ def generate_launch_description():
         parameters=[slam_params_file, {'use_sim_time': 'true'}],
     )
 
+    # 7) Velocity command multiplexer (teleop/joy/nav2 -> controller)
+    twist_mux = Node(
+        package='twist_mux',
+        executable='twist_mux',
+        name='twist_mux',
+        output='screen',
+        parameters=[twist_mux_params_file, {'use_sim_time': 'true'}],
+        remappings=[
+            ('cmd_vel_out', '/diff_cont/cmd_vel_unstamped'),
+        ],
+    )
+
     return LaunchDescription([
         rsp,
         gazebo,
         spawn_entity,
         controller_spawner_event,
+        slam_toolbox,
+        twist_mux,
     ])
