@@ -75,3 +75,20 @@
   'serial_baudrate': 115200,
   'scan_mode': 'Standard',
   ```
+
+## 7. Motor shaft keeps rotating slowly after joystick command stops
+- **Status**: Resolved
+- **Error**: After releasing/stopping the joystick forward command, `cmd_vel` stops commanding forward motion but the motor shaft continues rotating slowly.
+- **Suspected cause**: Unknown. Initial areas to check: joystick/teleop deadzone, `twist_mux` output behavior, diff drive controller timeout/zero command handling, firmware PID deadband/integral windup, or motor driver minimum PWM behavior.
+- **Troubleshooting log**:
+  - **Action**: Logged issue before troubleshooting.
+  - **Result**: Pending.
+  - **Action**: Checked `/cmd_vel` after joystick release.
+  - **Result**: `/cmd_vel` returns exactly zero; issue is likely downstream of ROS velocity command generation.
+  - **Action**: Inspected `motor_pid_controller.ino`.
+  - **Result**: Firmware resets PID integrators only on explicit `STOP`/`x`, not when receiving `CMD 0 0`; PID integral state or filtered velocity can still produce nonzero PWM after a normal zero velocity command.
+  - **Action**: Added firmware zero-target handling in `motor_pid_controller.ino`.
+  - **Result**: Each wheel now clears its integrator/previous error when its target is near zero, and zero-target wheels skip integral accumulation so stored effort cannot keep pushing PWM after joystick release.
+  - **Action**: Flashed/tested updated Arduino firmware.
+  - **Result**: Motor shaft no longer continues rotating slowly after joystick release.
+- **Resolution**: Zero wheel targets now clear PID integral state and skip further integral accumulation until a nonzero target is commanded.

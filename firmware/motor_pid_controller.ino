@@ -5,11 +5,11 @@ ROS 2 SERIAL PROTOCOL (matches mobile_robot_hardware plugin)
 - RX command: CMD <left_vel_rad_s> <right_vel_rad_s>
 - TX feedback: FB <left_vel_rad_s> <right_vel_rad_s> <left_pos_rad> <right_pos_rad>
 
-LEGACY MANUAL COMMANDS (for Serial Monitor/Plotter troubleshooting)
-- s<N> : set BOTH targets (N in ticks/sec)
-- l<N> : set LEFT target (N in ticks/sec)
-- r<N> : set RIGHT target (N in ticks/sec)
-- x    : stop + reset integrators
+MANUAL COMMANDS (for Serial Monitor/Plotter troubleshooting)
+- CMD <L> <R> : set both wheel targets (rad/s). e.g. "CMD 5 5"
+- CMD 0 0     : command stop WITHOUT resetting integrators (use to observe coast-down)
+- x or STOP   : stop + reset integrators (clears windup)
+Note: Serial Monitor line ending must be Newline (\n).
 
 WIRING (Arduino -> MDDS30)
 Right motor (Channel 2):
@@ -99,6 +99,9 @@ const float INTEG_MAX = 2000.0f;
 const int START_PWM_R = 35;
 const int START_PWM_L = 35;
 const float START_VEL_THRESH_RAD_S = 0.052f;
+
+/* ----- Stop handling ----- */
+const float STOP_TARGET_EPS_RAD_S = 0.05f;
 
 /* ----- Filtering ----- */
 static float vel_r_f = 0.0f, vel_l_f = 0.0f;
@@ -278,6 +281,20 @@ void loop()
   if (ENCODER_SIGN_LEFT)
     pos_l_rad = -pos_l_rad;
 
+  bool stop_target_r = fabs(target_r) < STOP_TARGET_EPS_RAD_S;
+  bool stop_target_l = fabs(target_l) < STOP_TARGET_EPS_RAD_S;
+
+  if (stop_target_r)
+  {
+    integ_r = 0.0f;
+    prev_err_r = 0.0f;
+  }
+  if (stop_target_l)
+  {
+    integ_l = 0.0f;
+    prev_err_l = 0.0f;
+  }
+
   float err_r = target_r - vel_r_f;
   float err_l = target_l - vel_l_f;
 
@@ -295,11 +312,13 @@ void loop()
   bool sat_r = (fabs(pwm_r_raw) > PWM_MAX);
   bool sat_l = (fabs(pwm_l_raw) > PWM_MAX);
 
-  if (!(sat_r && ((pwm_r > 0 && err_r > 0) || (pwm_r < 0 && err_r < 0))))
+  if (!stop_target_r &&
+      !(sat_r && ((pwm_r > 0 && err_r > 0) || (pwm_r < 0 && err_r < 0))))
   {
     integ_r = constrain(integ_r + err_r * DT, -INTEG_MAX, INTEG_MAX);
   }
-  if (!(sat_l && ((pwm_l > 0 && err_l > 0) || (pwm_l < 0 && err_l < 0))))
+  if (!stop_target_l &&
+      !(sat_l && ((pwm_l > 0 && err_l > 0) || (pwm_l < 0 && err_l < 0))))
   {
     integ_l = constrain(integ_l + err_l * DT, -INTEG_MAX, INTEG_MAX);
   }
