@@ -49,8 +49,8 @@ const bool ENCODER_SIGN_LEFT = false;
 /* ----- Encoder conversion -----
 Set this to encoder counts-per-wheel-revolution (after gearbox).
 */
-const float TICKS_PER_REV_RIGHT = 600.0f;
-const float TICKS_PER_REV_LEFT = 600.0f;
+const float TICKS_PER_REV_RIGHT = 495.0f; // Physically calibrated value
+const float TICKS_PER_REV_LEFT = 495.0f;  // Physically calibrated value
 const float TWO_PI_F = 6.28318530718f;
 
 /* ----- Encoder counts ----- */
